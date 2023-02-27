@@ -1,20 +1,61 @@
 import csv
 import pymysql
 
-
 if __name__ == '__main__':
 
-    # Conexión a la base de datos
-    connection = pymysql.connect(host='localhost', user='root', password='', database='pract1')
+    connection = pymysql.connect(host='localhost', user='root', password='')
+    connection.cursor().execute("CREATE DATABASE IF NOT EXISTS pract1;")
 
-    # Creación del objeto cursor
+    connection = pymysql.connect(host='localhost', user='root', password='', database='pract1')
     cursor = connection.cursor()
+
+    query = "CREATE TABLE IF NOT EXISTS edinburgh (" \
+                "id INT NOT NULL," \
+                "host_id INT," \
+                "host_name TEXT," \
+                "host_location TEXT," \
+                "host_response_time TIME," \
+                "host_has_profile_pic BOOLEAN," \
+                "host_identity_verified BOOLEAN," \
+                "latitude DOUBLE," \
+                "longitude DOUBLE," \
+                "neighbourhood TEXT," \
+                "neighbourhood_cleansed TEXT," \
+                "property_type TEXT," \
+                "room_type TEXT," \
+                "accommodates INT," \
+                "bathrooms_text TEXT," \
+                "bedrooms INT," \
+                "amenities JSON," \
+                "price DECIMAL(10,2)," \
+                "minimum_nights INT," \
+                "maximum_nights INT," \
+                "minimum_nights_avg_ntm INT," \
+                "maximum_nights_avg_ntm INT," \
+                "has_availability BOOLEAN," \
+                "availability_30 INT," \
+                "availability_60 INT," \
+                "availability_90 INT," \
+                "availability_365 INT," \
+                "number_of_reviews INT," \
+                "review_scores_rating FLOAT," \
+                "review_scores_accuracy FLOAT," \
+                "review_scores_cleanliness FLOAT," \
+                "review_scores_checkin FLOAT," \
+                "review_scores_communication FLOAT," \
+                "review_scores_location FLOAT," \
+                "review_scores_value FLOAT," \
+                "reviews_per_month DECIMAL(10,2)" \
+            ");"
+    cursor.execute(query)
+
+    query = "CREATE TABLE IF NOT EXISTS santiago LIKE edinburgh;"
+    cursor.execute(query)
+
     cursor.execute("SELECT COUNT(*) FROM edinburgh")
     rowsEdinburgh = cursor.fetchone()
-
     cursor.execute("SELECT COUNT(*) FROM santiago")
     rowsSantiago = cursor.fetchone()
-
 
     if (rowsEdinburgh[0] > 0):
         print("La taula edinburgh ja esta plena")
