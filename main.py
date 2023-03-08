@@ -1,5 +1,6 @@
 import csv
 import pymysql
+import json
 
 if __name__ == '__main__':
 
@@ -38,14 +39,12 @@ if __name__ == '__main__':
 
                 row[25] = '1' if row[25] == 't' else '0'
                 row[26] = '1' if row[26] == 't' else '0'
-                #row[50] = '1' if row[50] == 't' else '0'
 
-                #row[40] = row[40][1:]
-
-                cursor.execute(query, (
-                    row[9], row[11], row[13], row[15], row[25], row[26]))
-
-                print(row[9])
+                try:
+                    cursor.execute(query, (
+                        row[9], row[11], row[13], row[15], row[25], row[26]))
+                except:
+                    continue
 
         with open('santiago.csv', newline='', encoding='utf-8') as file:
             reader_csv = csv.reader(file, delimiter=',')
@@ -57,12 +56,12 @@ if __name__ == '__main__':
 
                 row[25] = '1' if row[25] == 't' else '0'
                 row[26] = '1' if row[26] == 't' else '0'
-                # row[50] = '1' if row[50] == 't' else '0'
 
-                # row[40] = row[40][1:]
-
-                cursor.execute(query, (
-                    row[9], row[11], row[13], row[15], row[25], row[26]))
+                try:
+                    cursor.execute(query, (
+                        row[9], row[11], row[13], row[15], row[25], row[26]))
+                except:
+                    continue
 
 
 
@@ -143,56 +142,37 @@ if __name__ == '__main__':
 
         print("dades insertades a santiago correctament")
 
-    # TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA AMENITIES
-    #
-    # query = "CREATE TABLE IF NOT EXISTS amenities (" \
-    #         "id_listing INT" \
-    #         "text TEXT," \
-    #         "location TEXT);"
-    #
-    # cursor.execute(query)
-    #
-    # cursor.execute("SELECT COUNT(*) FROM amenities")
-    # rowsAmenities = cursor.fetchone()
-    #
-    # if rowsAmenities[0] > 0:
-    #     print("la taula hosts ja esta plena")
-    # else:
-    #     with open('edinburgh.csv', newline='', encoding='utf-8') as file:
-    #         reader_csv = csv.reader(file, delimiter=',')
-    #         next(reader_csv)
-    #
-    #         for row in reader_csv:
-    #             query = "INSERT INTO amenities (id_listing, text, location) " \
-    #                     "VALUES (%s, %s, %s)"
-    #
-    #             #row[25] = '1' if row[25] == 't' else '0'
-    #             #row[26] = '1' if row[26] == 't' else '0'
-    #             # row[50] = '1' if row[50] == 't' else '0'
-    #
-    #             # row[40] = row[40][1:]
-    #
-    #             cursor.execute(query, (
-    #                 row[9], row[39], "Edinburgh"))
-    #
-    #     with open('santiago.csv', newline='', encoding='utf-8') as file:
-    #         reader_csv = csv.reader(file, delimiter=',')
-    #         next(reader_csv)
-    #
-    #         for row in reader_csv:
-    #             query = "INSERT INTO amenities (id_listing, text, location) " \
-    #                     "VALUES (%s, %s, %s)"
-    #
-    #             # row[25] = '1' if row[25] == 't' else '0'
-    #             # row[26] = '1' if row[26] == 't' else '0'
-    #             # row[50] = '1' if row[50] == 't' else '0'
-    #
-    #             # row[40] = row[40][1:]
-    #
-    #             cursor.execute(query, (
-    #                 row[9], row[39], "Santiago"))
-    #
-    #     print("dades insertades a hosts correctament")
+    # TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA LISTING_AMENITIES
+
+    for city in ["edinburgh", "santiago"]:
+        query = "CREATE TABLE IF NOT EXISTS listing_amenities_"+city+" (" \
+                "id_listing BIGINT," \
+                "amenity_name TEXT," \
+                "FOREIGN KEY (id_listing) REFERENCES "+city+" (id))"
+
+        cursor.execute(query)
+
+        cursor.execute("SELECT COUNT(*) FROM listing_amenities_"+city)
+        rowsAmenities = cursor.fetchone()
+
+        if rowsAmenities[0] > 0:
+            print("la taula listing_amenities_santiago ja esta plena")
+
+        with open(city + '.csv', newline='', encoding='utf-8') as file:
+            reader_csv = csv.reader(file, delimiter=',')
+            next(reader_csv)
+
+            for row in reader_csv:
+                json_object = json.loads(row[39])
+                for amenity in json_object:
+                    query = "INSERT INTO listing_amenities_" + city + " (id_listing, amenity_name) " \
+                        "VALUES (%s, %s)"
+
+                    cursor.execute(query, (
+                        row[0], amenity))
+
+        print("dades insertades a listing_amenities_" + city + "correctament")
+
 
     #Estudi de les variables individualitzades amb R
 
