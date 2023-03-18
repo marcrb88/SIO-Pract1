@@ -60,8 +60,8 @@ if __name__ == '__main__':
                 "price DECIMAL(10,2)," \
                 "minimum_nights INT," \
                 "maximum_nights INT," \
-                "minimum_nights_avg_ntm INT," \
-                "maximum_nights_avg_ntm INT," \
+                "minimum_nights_avg_ntm FLOAT," \
+                "maximum_nights_avg_ntm FLOAT," \
                 "host_id BIGINT," \
                 "FOREIGN KEY (host_id) REFERENCES hosts(host_id))"
 
@@ -153,7 +153,7 @@ if __name__ == '__main__':
                         cursor.execute(query, (
                             row[0], amenity))
 
-            print("dades insertades a listing_amenities_" + city + "correctament")
+            print("dades insertades a listing_amenities_" + city + " correctament")
 
     # TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA GEOLOCATION
 
