@@ -5,6 +5,7 @@ import json
 if __name__ == '__main__':
 
     connection = pymysql.connect(host='localhost', user='root', password='')
+    connection.cursor().execute("DROP DATABASE IF EXISTS pract1;")
     connection.cursor().execute("CREATE DATABASE IF NOT EXISTS pract1;")
 
     connection = pymysql.connect(host='localhost', user='root', password='', database='pract1')
@@ -13,13 +14,13 @@ if __name__ == '__main__':
     #TOT EL QUE FA REFERÈNCIA A LA CREACIO I INSERCIÓ DE LA TAULA HOST
 
     query = "CREATE TABLE IF NOT EXISTS hosts (" \
-            "host_id BIGINT PRIMARY KEY," \
-            "host_name TEXT," \
-            "host_location TEXT," \
-            "host_response_time TEXT," \
-            "host_has_profile_pic BOOLEAN," \
-            "host_identity_verified BOOLEAN);"
-
+                "host_id BIGINT PRIMARY KEY," \
+                "host_name TEXT," \
+                "host_location TEXT," \
+                "host_response_time TEXT," \
+                "host_has_profile_pic BOOLEAN," \
+                "host_identity_verified BOOLEAN" \
+            ")"
     cursor.execute(query)
 
     cursor.execute("SELECT COUNT(*) FROM hosts")
@@ -48,24 +49,22 @@ if __name__ == '__main__':
 
     print("dades insertades a hosts correctament")
 
-    #TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA EDINBURGH
-
-    query = "CREATE TABLE IF NOT EXISTS edinburgh (" \
-                "id BIGINT PRIMARY KEY," \
-                "property_type TEXT," \
-                "room_type TEXT," \
-                "accommodates INT," \
-                "bathrooms_text TEXT," \
-                "bedrooms INT," \
-                "price DECIMAL(10,2)," \
-                "minimum_nights INT," \
-                "maximum_nights INT," \
-                "minimum_nights_avg_ntm FLOAT," \
-                "maximum_nights_avg_ntm FLOAT," \
-                "host_id BIGINT," \
-                "FOREIGN KEY (host_id) REFERENCES hosts(host_id))"
-
-    cursor.execute(query)
+    for city in ["edinburgh", "santiago"]:
+        query = "CREATE TABLE IF NOT EXISTS " + city + " (" \
+                    "id BIGINT PRIMARY KEY," \
+                    "property_type TEXT," \
+                    "room_type TEXT," \
+                    "accommodates INT," \
+                    "bathrooms_text TEXT," \
+                    "bedrooms INT," \
+                    "price NUMERIC," \
+                    "minimum_nights INT," \
+                    "maximum_nights INT," \
+                    "minimum_nights_avg_ntm FLOAT," \
+                    "maximum_nights_avg_ntm FLOAT," \
+                    "host_id BIGINT," \
+                    "FOREIGN KEY (host_id) REFERENCES hosts(host_id))"
+        cursor.execute(query)
 
     cursor.execute("SELECT COUNT(*) FROM edinburgh")
     rowsEdinburgh = cursor.fetchone()
@@ -73,7 +72,6 @@ if __name__ == '__main__':
     if rowsEdinburgh[0] > 0:
         print("La taula edinburgh ja esta plena")
     else:
-        # Apertura de l'arxiu edinburgh.csv
         with open('edinburgh.csv', newline='', encoding='utf-8') as file:
             reader_csv = csv.reader(file, delimiter=',')
             next(reader_csv)
@@ -81,22 +79,10 @@ if __name__ == '__main__':
             for row in reader_csv:
                 query = "INSERT INTO edinburgh (id, property_type, room_type, accommodates, bathrooms_text, bedrooms, price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm, host_id) " \
                     "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                #row[25] = '1' if row[25] == 't' else '0'
-                #row[26] = '1' if row[26] == 't' else '0'
-                #row[50] = '1' if row[50] == 't' else '0'
-
                 row[40] = row[40][1:]
-
-                cursor.execute(query, (
-                    row[0], row[32], row[33], row[34], row[36], row[37], row[40], row[41], row[42], row[47], row[48], row[9]))
+                cursor.execute(query, (row[0], row[32], row[33], row[34], row[36], row[37], row[40].replace("$", "").replace(",", ""), row[41], row[42], row[47], row[48], row[9]))
 
         print("dades insertades a edinburgh correctament")
-
-    # TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA SANTIAGO
-
-    query = "CREATE TABLE IF NOT EXISTS santiago LIKE edinburgh;"
-    cursor.execute(query)
 
     cursor.execute("SELECT COUNT(*) FROM santiago")
     rowsSantiago = cursor.fetchone()
@@ -111,19 +97,10 @@ if __name__ == '__main__':
             for row in reader_csv:
                 query = "INSERT INTO santiago (id, property_type, room_type, accommodates, bathrooms_text, bedrooms, price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm, host_id) " \
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-
-                #row[25] = '1' if row[25] == 't' else '0'
-                #row[26] = '1' if row[26] == 't' else '0'
-                #row[50] = '1' if row[50] == 't' else '0'
-
                 row[40] = row[40][1:]
-
-                cursor.execute(query, (
-                    row[0], row[32], row[33], row[34], row[36], row[37], row[40], row[41], row[42], row[47], row[48], row[9]))
+                cursor.execute(query, (row[0], row[32], row[33], row[34], row[36], row[37], row[40], row[41], row[42], row[47], row[48], row[9]))
 
         print("dades insertades a santiago correctament")
-
-    # TOT EL QUE FA REFERÈNCIA A LA CREACIÓ I INSERCIÓ DE LA TAULA LISTING_AMENITIES
 
     for city in ["edinburgh", "santiago"]:
         query = "CREATE TABLE IF NOT EXISTS listing_amenities_"+city+" (" \
@@ -150,8 +127,7 @@ if __name__ == '__main__':
                         query = "INSERT INTO listing_amenities_" + city + " (id_listing, amenity_name) " \
                             "VALUES (%s, %s)"
 
-                        cursor.execute(query, (
-                            row[0], amenity))
+                        cursor.execute(query, (row[0], amenity))
 
             print("dades insertades a listing_amenities_" + city + " correctament")
 
@@ -164,6 +140,7 @@ if __name__ == '__main__':
                 "latitude FLOAT," \
                 "longitude FLOAT," \
                 "neighbourhood TEXT," \
+                "neighbourhood_cleansed TEXT," \
                 "FOREIGN KEY (id_listing) REFERENCES " + city + " (id))"
 
         cursor.execute(query)
@@ -180,11 +157,11 @@ if __name__ == '__main__':
                 next(reader_csv)
 
                 for row in reader_csv:
-                    query = "INSERT INTO geolocation_" + city + " (id_listing, latitude, longitude, neighbourhood ) " \
-                            "VALUES (%s, %s, %s, %s)"
+                    query = "INSERT INTO geolocation_" + city + " (id_listing, latitude, longitude, neighbourhood, neighbourhood_cleansed) " \
+                            "VALUES (%s, %s, %s, %s, %s)"
 
                     cursor.execute(query, (
-                        row[0], row[30], row[31], row[27]))
+                        row[0], row[30], row[31], row[27], row[28]))
 
             print("dades insertades a geolocation_" + city + "correctament")
 
