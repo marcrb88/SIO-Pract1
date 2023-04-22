@@ -8,8 +8,8 @@ result <- dbSendQuery(conn, "SELECT g.neighbourhood_cleansed, r.review_scores_ra
 data <- dbFetch(result, n=-1)
 df <- data.frame(data)
 
-ggplot(df, aes(x = neighbourhood_cleansed, y = review_scores_rating)) +
-  geom_point() +
+ggplot(df, aes(x = reorder(neighbourhood_cleansed, -review_scores_rating), y = review_scores_rating)) +
+  stat_summary(fun = mean, geom = "bar", fill = "blue", color = "black", width = 0.7) +
   labs(x = "Neighborhood", y = "Review Score", title = "Review Scores by Neighborhood") +
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
 
