@@ -1,3 +1,5 @@
+source("conversion-rates.R")
+
 library(RMySQL)
 library(ggplot2)
 
@@ -21,9 +23,13 @@ for (listing_id in df$id) {
 
 df <- merge(df, fillable_df, by = "id", all.x = TRUE)
 
+df$price <- df$price * GBP_TO_USD_RATE
+
+df <- subset(df, price <= 2000)
+
 plot(x=df$number_of_amenities, y=df$price,
     main = "Correlació entre el número de comoditats i el preu",
-    xlab = "Número de comoditats", ylab = "Preu",
+    xlab = "Número de comoditats", ylab = "Preu (USD)",
     col=rgb(0.8, 0.2, 0.2), pch=20)
 abline(lm(df$price~df$number_of_amenities), lwd=3,
     col=rgb(0.2, 0.2, 0.8, 0.8))

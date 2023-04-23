@@ -37,7 +37,6 @@ if __name__ == '__main__':
                 for row in reader_csv:
                     query = "INSERT INTO hosts (host_id, host_name, host_location, host_response_time, host_has_profile_pic, host_identity_verified) " \
                             "VALUES (%s, %s, %s, %s, %s, %s)"
-
                     row[25] = '1' if row[25] == 't' else '0'
                     row[26] = '1' if row[26] == 't' else '0'
 
@@ -98,7 +97,7 @@ if __name__ == '__main__':
                 query = "INSERT INTO santiago (id, property_type, room_type, accommodates, bathrooms_text, bedrooms, price, minimum_nights, maximum_nights, minimum_nights_avg_ntm, maximum_nights_avg_ntm, host_id) " \
                         "VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
                 row[40] = row[40][1:]
-                cursor.execute(query, (row[0], row[32], row[33], row[34], row[36], row[37], row[40], row[41], row[42], row[47], row[48], row[9]))
+                cursor.execute(query, (row[0], row[32], row[33], row[34], row[36], row[37], row[40].replace("$", "").replace(",", ""), row[41], row[42], row[47], row[48], row[9]))
 
         print("dades insertades a santiago correctament")
 

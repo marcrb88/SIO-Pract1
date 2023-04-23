@@ -10,7 +10,7 @@ df <- data.frame(data)
 
 ggplot(df, aes(x = reorder(neighbourhood_cleansed, -review_scores_rating), y = review_scores_rating)) +
   stat_summary(fun = mean, geom = "bar", fill = "blue", color = "black", width = 0.7) +
-  labs(x = "Neighborhood", y = "Review Score", title = "Review Scores by Neighborhood") +
-  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
+  labs(x = "Barri", y = "Valoració global", title = "Valoració global mitjana en funció del barri") +
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1), plot.title = element_text(hjust = 0.5))
 
 ggsave("review_scores_by_neighbourhood_edinburgh.png", width = 12, height = 7, dpi = 300)

@@ -25,7 +25,8 @@ final_df <- merge(final_df, df, by = "host_id", all.x = TRUE)
 
 ggplot(final_df, aes(x=host_response_time, y=reviews_mean)) +
     stat_summary(fun=mean, geom="bar", fill="steelblue") +
-    labs(x = "Host Response Time", y = "Reviews Score Mean") +
+    labs(x = "Temps de resposta de l'amfitrió", y = "Valoració global", title = "Valoració global mitjana en funció del temps de resposta de l'amfitrió") +
+    theme(plot.title = element_text(hjust = 0.5)) +
     ylim(0, 5)
 
 ggsave("review_scores_mean_by_host_response_time_edinburgh.png", width = 7, height = 5, dpi = 300)
