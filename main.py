@@ -103,7 +103,7 @@ if __name__ == '__main__':
     cursor.execute(query)
 
     for city in city_list:
-        with open(f"{city}.csv", newline='', encoding='utf-8') as file:
+        with open(f"csv/{city}.csv", newline='', encoding='utf-8') as file:
             reader_csv = csv.reader(file, delimiter=',')
             next(reader_csv)
             for row in reader_csv:
