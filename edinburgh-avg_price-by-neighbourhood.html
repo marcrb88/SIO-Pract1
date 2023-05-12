@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="./geojson/edinburghGeoJson.js"></script>
+    <style>
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+    </style>
+</head>
+<body>
+    <div id="myMap" style="width: 1920px; height: 1080px"></div>
+    <script type="text/javascript">
+        fetch("http://localhost:3000/edinburgh/avg-price-by-neighbourhood-cleansed")
+            .then(response => response.json())
+            .then(data => {
+                edinburghGeoJson.features.forEach(feature => {
+                    const matchingData = data.find(obj => obj.neighbourhood_cleansed === feature.properties.neighbourhood);
+                    if (matchingData) {
+                        feature.properties.avg_price = matchingData.avg_price;
+                    }
+                });
+                const _map = L.map("myMap").setView([55.953251, -3.188267], 11);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(_map);
+                const info = L.control();
+                info.onAdd = map => {
+                    info._div = L.DomUtil.create('div', 'info');
+                    info.update();
+                    return info._div;
+                };
+                info.update = props => {
+                    info._div.innerHTML = '<h4>Edinburgh average price</h4>' +  (props ?
+                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_price + ' GBP'
+                        : 'Hover over a neighbourhood');
+                };
+                info.addTo(_map);
+                function getColor(avg_price) {
+                    return avg_price > 700 ? '#084594' :
+                           avg_price > 600 ? '#2171b5' :
+                           avg_price > 500 ? '#4292c6' :
+                           avg_price > 400 ? '#6baed6' :
+                           avg_price > 300 ? '#9ecae1' :
+                           avg_price > 200 ? '#c6dbef' :
+                           avg_price > 100 ? '#deebf7' :
+                                             '#f7fbff';
+                }
+                function style(feature) {
+                    return {
+                        fillColor: getColor(feature.properties.avg_price),
+                        weight: 2,
+                        opacity: 1,
+                        color: 'black',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    }
+                }
+                function highlightFeature(e) {
+                    var layer = e.target;
+                    layer.setStyle({
+                        weight: 5,
+                        color: '#666',
+                        dashArray: '',
+                        fillOpacity: 0.7
+                    });
+                    layer.bringToFront();
+                    info.update(layer.feature.properties);
+                }
+                const geojson = L.geoJson(edinburghGeoJson, {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(_map);
+                function resetHighlight(e) {
+                    geojson.resetStyle(e.target);
+                    info.update();
+                }
+                function onEachFeature(feature, layer) {
+                    layer.on({
+                        mouseover: highlightFeature,
+                        mouseout: resetHighlight
+                    });
+                }
+            });
+    </script>
+</body>
+</html>
