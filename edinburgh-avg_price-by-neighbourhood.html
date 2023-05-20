@@ -18,6 +18,18 @@
             margin: 0 0 5px;
             color: #777;
         }
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        
     </style>
 </head>
 <body>
@@ -51,13 +63,13 @@
                 info.addTo(_map);
                 function getColor(avg_price) {
                     return avg_price > 700 ? '#084594' :
-                           avg_price > 600 ? '#2171b5' :
-                           avg_price > 500 ? '#4292c6' :
-                           avg_price > 400 ? '#6baed6' :
-                           avg_price > 300 ? '#9ecae1' :
-                           avg_price > 200 ? '#c6dbef' :
-                           avg_price > 100 ? '#deebf7' :
-                                             '#f7fbff';
+                           avg_price > 600 ? '#2171B5' :
+                           avg_price > 500 ? '#4292C6' :
+                           avg_price > 400 ? '#6BAED6' :
+                           avg_price > 300 ? '#9ECAE1' :
+                           avg_price > 200 ? '#C6DBEF' :
+                           avg_price > 100 ? '#DEEBF7' :
+                                             '#F7FBFF';
                 }
                 function style(feature) {
                     return {
@@ -94,7 +106,27 @@
                         mouseout: resetHighlight
                     });
                 }
-            });
+                var legend = L.control({position: 'bottomright'});
+
+                legend.onAdd = function (_map) {
+
+                    var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [100, 200, 300, 400, 500, 600, 700],
+                    labels = [];
+
+                    // loop through our density intervals and generate a label with a colored square for each interval
+                    for (var i = 0; i < grades.length; i++) {
+                        console.log('<i style="background:' + getColor(grades[i] + 1));
+                        div.innerHTML +=
+                            '<i style="background-color:' + getColor(grades[i] + 1) + '"></i> ' +
+                            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                    }
+
+                    return div;
+                };
+
+            legend.addTo(_map);
+        });
     </script>
 </body>
 </html>

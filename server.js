@@ -13,6 +13,7 @@ app.use((req, res, next) => {
 });
 
 app.get('/edinburgh/avg-price-by-neighbourhood-cleansed', (req, res) => {
+    console.log("entra")
     var con = mysql.createConnection({
         host: "localhost",
         port: 3306,
