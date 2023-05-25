@@ -13,7 +13,6 @@ app.use((req, res, next) => {
 });
 
 app.get('/edinburgh/avg-price-by-neighbourhood-cleansed', (req, res) => {
-    console.log("entra")
     var con = mysql.createConnection({
         host: "localhost",
         port: 3306,
@@ -30,6 +29,33 @@ app.get('/edinburgh/avg-price-by-neighbourhood-cleansed', (req, res) => {
     con.query(`SELECT geolocation.neighbourhood_cleansed, AVG(listing.price) as avg_price ` +
                 `FROM geolocation ` +
                 `JOIN listing ON geolocation.id_listing = listing.id ` +
+                `WHERE geolocation.municipality = "edinburgh" ` +
+                `GROUP BY geolocation.neighbourhood_cleansed`, (err, result) => {
+        if (err) throw err;
+        res.json(result);
+    });
+    con.end(err => {
+        if (err) throw err;
+    });
+});
+
+app.get('/edinburgh/avg-reviews-by-neighbourhood-cleansed', (req, res) => {
+    var con = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "",
+        database: "pract1"
+    });
+    con.connect(err => {
+        if (err) {
+            res.status(500).send();
+            return;
+        }
+    });
+    con.query(`SELECT geolocation.neighbourhood_cleansed, AVG(reviews.review_scores_value) as avg_review ` +
+                `FROM geolocation ` +
+                `JOIN reviews ON geolocation.id_listing = reviews.id_listing ` +
                 `WHERE geolocation.municipality = "edinburgh" ` +
                 `GROUP BY geolocation.neighbourhood_cleansed`, (err, result) => {
         if (err) throw err;

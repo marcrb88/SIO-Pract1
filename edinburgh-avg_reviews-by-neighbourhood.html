@@ -35,14 +35,17 @@
 <body>
     <div id="myMap" style="width: 1920px; height: 1080px"></div>
     <script type="text/javascript">
-        fetch("http://localhost:3000/edinburgh/avg-price-by-neighbourhood-cleansed")
-            .then(response => response.json())
+        fetch("http://localhost:3000/edinburgh/avg-reviews-by-neighbourhood-cleansed")
+            .then(
+                response => response.json()
+            )
             .then(data => {
                 edinburghGeoJson.features.forEach(feature => {
                     const matchingData = data.find(obj => obj.neighbourhood_cleansed === feature.properties.neighbourhood);
                     if (matchingData) {
-                        feature.properties.avg_price = matchingData.avg_price;
+                        feature.properties.avg_review = matchingData.avg_review;
                     }
+                    console.log(feature.properties.avg_review)
                 });
                 const _map = L.map("myMap").setView([55.953251, -3.188267], 11);
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -57,23 +60,23 @@
                 };
                 info.update = props => {
                     info._div.innerHTML = '<h4>Edinburgh average price</h4>' +  (props ?
-                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_price + ' GBP'
+                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_review + ' GBP'
                         : 'Hover over a neighbourhood');
                 };
                 info.addTo(_map);
-                function getColor(avg_price) {
-                    return avg_price > 700 ? '#084594' :
-                           avg_price > 600 ? '#2171B5' :
-                           avg_price > 500 ? '#4292C6' :
-                           avg_price > 400 ? '#6BAED6' :
-                           avg_price > 300 ? '#9ECAE1' :
-                           avg_price > 200 ? '#C6DBEF' :
-                           avg_price > 100 ? '#DEEBF7' :
+                function getColor(avg_review) {
+                    return avg_review > 700 ? '#084594' :
+                           avg_review > 600 ? '#2171B5' :
+                           avg_review > 500 ? '#4292C6' :
+                           avg_review > 400 ? '#6BAED6' :
+                           avg_review > 300 ? '#9ECAE1' :
+                           avg_review > 200 ? '#C6DBEF' :
+                           avg_review > 100 ? '#DEEBF7' :
                                              '#F7FBFF';
                 }
                 function style(feature) {
                     return {
-                        fillColor: getColor(feature.properties.avg_price),
+                        fillColor: getColor(feature.properties.avg_review),
                         weight: 2,
                         opacity: 1,
                         color: 'black',
