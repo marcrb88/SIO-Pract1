@@ -53,7 +53,7 @@ app.get('/edinburgh/avg-reviews-by-neighbourhood-cleansed', (req, res) => {
             return;
         }
     });
-    con.query(`SELECT geolocation.neighbourhood_cleansed, AVG(reviews.review_scores_value) as avg_review ` +
+    con.query(`SELECT geolocation.neighbourhood_cleansed, AVG(reviews.review_scores_value) as avg_review_scores_value ` +
                 `FROM geolocation ` +
                 `JOIN reviews ON geolocation.id_listing = reviews.id_listing ` +
                 `WHERE geolocation.municipality = "edinburgh" ` +

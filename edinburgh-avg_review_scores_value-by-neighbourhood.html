@@ -43,9 +43,8 @@
                 edinburghGeoJson.features.forEach(feature => {
                     const matchingData = data.find(obj => obj.neighbourhood_cleansed === feature.properties.neighbourhood);
                     if (matchingData) {
-                        feature.properties.avg_review = matchingData.avg_review;
+                        feature.properties.avg_review_scores_value = matchingData.avg_review_scores_value;
                     }
-                    console.log(feature.properties.avg_review)
                 });
                 const _map = L.map("myMap").setView([55.953251, -3.188267], 11);
                 L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -59,24 +58,24 @@
                     return info._div;
                 };
                 info.update = props => {
-                    info._div.innerHTML = '<h4>Edinburgh average price</h4>' +  (props ?
-                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_review + ' GBP'
+                    info._div.innerHTML = '<h4>Edinburgh average review scores</h4>' +  (props ?
+                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_review_scores_value + ' rating'
                         : 'Hover over a neighbourhood');
                 };
                 info.addTo(_map);
-                function getColor(avg_review) {
-                    return avg_review > 700 ? '#084594' :
-                           avg_review > 600 ? '#2171B5' :
-                           avg_review > 500 ? '#4292C6' :
-                           avg_review > 400 ? '#6BAED6' :
-                           avg_review > 300 ? '#9ECAE1' :
-                           avg_review > 200 ? '#C6DBEF' :
-                           avg_review > 100 ? '#DEEBF7' :
-                                             '#F7FBFF';
+                function getColor(avg_review_scores_value) {
+                    return avg_review_scores_value > 4.75 ? '#005A32' :
+                           avg_review_scores_value > 4.5  ? '#238B45' :
+                           avg_review_scores_value > 4.25 ? '#41AB5D' :
+                           avg_review_scores_value > 4    ? '#74C476' :
+                           avg_review_scores_value > 3.75 ? '#A1D99B' :
+                           avg_review_scores_value > 3.5  ? '#C7E9C0' :
+                           avg_review_scores_value > 3.25 ? '#E5F5E0' :
+                                                            '#F7FCF5';
                 }
                 function style(feature) {
                     return {
-                        fillColor: getColor(feature.properties.avg_review),
+                        fillColor: getColor(feature.properties.avg_review_scores_value),
                         weight: 2,
                         opacity: 1,
                         color: 'black',
@@ -110,24 +109,17 @@
                     });
                 }
                 var legend = L.control({position: 'bottomright'});
-
                 legend.onAdd = function (_map) {
-
                     var div = L.DomUtil.create('div', 'info legend'),
-                    grades = [100, 200, 300, 400, 500, 600, 700],
-                    labels = [];
-
-                    // loop through our density intervals and generate a label with a colored square for each interval
+                    grades = [0, 3.25, 3.5, 3.75, 4, 4.25, 4.5, 4.75];
                     for (var i = 0; i < grades.length; i++) {
                         div.innerHTML +=
-                            '<i style="background-color:' + getColor(grades[i] + 1) + '"></i> ' +
+                            '<i style="background-color:' + getColor(grades[i] + 0.01) + '"></i> ' +
                             grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
                     }
-
                     return div;
                 };
-
-            legend.addTo(_map);
+                legend.addTo(_map);
         });
     </script>
 </body>
