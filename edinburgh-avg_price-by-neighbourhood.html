@@ -107,24 +107,17 @@
                     });
                 }
                 var legend = L.control({position: 'bottomright'});
-
                 legend.onAdd = function (_map) {
-
                     var div = L.DomUtil.create('div', 'info legend'),
-                    grades = [100, 200, 300, 400, 500, 600, 700],
-                    labels = [];
-
-                    // loop through our density intervals and generate a label with a colored square for each interval
+                    grades = [0, 100, 200, 300, 400, 500, 600, 700];
                     for (var i = 0; i < grades.length; i++) {
                         div.innerHTML +=
                             '<i style="background-color:' + getColor(grades[i] + 1) + '"></i> ' +
                             grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
                     }
-
                     return div;
                 };
-
-            legend.addTo(_map);
+                legend.addTo(_map);
         });
     </script>
 </body>
