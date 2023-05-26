@@ -66,6 +66,33 @@ app.get('/edinburgh/avg-reviews-by-neighbourhood-cleansed', (req, res) => {
     });
 });
 
+app.get('/santiago/avg-price-by-neighbourhood-cleansed', (req, res) => {
+    var con = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "",
+        database: "pract1"
+    });
+    con.connect(err => {
+        if (err) {
+            res.status(500).send();
+            return;
+        }
+    });
+    con.query(`SELECT geolocation.neighbourhood_cleansed, AVG(listing.price) as avg_price ` +
+                `FROM geolocation ` +
+                `JOIN listing ON geolocation.id_listing = listing.id ` +
+                `WHERE geolocation.municipality = "santiago" ` +
+                `GROUP BY geolocation.neighbourhood_cleansed`, (err, result) => {
+        if (err) throw err;
+        res.json(result);
+    });
+    con.end(err => {
+        if (err) throw err;
+    });
+});
+
 app.listen(app.get('port'), () => {
     console.log('Server started: http://localhost:' + app.get('port') + '/');
 });

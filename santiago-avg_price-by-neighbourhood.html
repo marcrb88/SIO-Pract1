@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="./geojson/santiagoGeoJson.js"></script>
+    <style>
+        .info {
+            padding: 6px 8px;
+            font: 14px/16px Arial, Helvetica, sans-serif;
+            background: white;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 5px;
+        }
+        .info h4 {
+            margin: 0 0 5px;
+            color: #777;
+        }
+        .legend {
+            line-height: 18px;
+            color: #555;
+        }
+        .legend i {
+            width: 18px;
+            height: 18px;
+            float: left;
+            margin-right: 8px;
+            opacity: 0.7;
+        }
+        
+    </style>
+</head>
+<body>
+    <div id="myMap" style="width: 1920px; height: 1080px"></div>
+    <script type="text/javascript">
+        fetch("http://localhost:3000/santiago/avg-price-by-neighbourhood-cleansed")
+            .then(response => response.json())
+            .then(data => {
+                santiagoGeoJson.features.forEach(feature => {
+                    const matchingData = data.find(obj => obj.neighbourhood_cleansed === feature.properties.neighbourhood);
+                    if (matchingData) {
+                        feature.properties.avg_price = matchingData.avg_price;
+                    }
+                });
+                const _map = L.map("myMap").setView([-33.4569400, -70.6482700], 11);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(_map);
+                const info = L.control();
+                info.onAdd = map => {
+                    info._div = L.DomUtil.create('div', 'info');
+                    info.update();
+                    return info._div;
+                };
+                info.update = props => {
+                    info._div.innerHTML = '<h4>Santiago average price</h4>' +  (props ?
+                        '<b>' + props.neighbourhood + '</b><br />' + props.avg_price + ' CLP'
+                        : 'Hover over a neighbourhood');
+                };
+                info.addTo(_map);
+                function getColor(avg_price) {
+                    return avg_price > 262500 ? '#084594' :
+                           avg_price > 225000 ? '#2171B5' :
+                           avg_price > 187500 ? '#4292C6' :
+                           avg_price > 150000 ? '#6BAED6' :
+                           avg_price > 112500 ? '#9ECAE1' :
+                           avg_price > 75000  ? '#C6DBEF' :
+                           avg_price > 37500  ? '#DEEBF7' :
+                                                '#F7FBFF';
+                }
+                function style(feature) {
+                    return {
+                        fillColor: getColor(feature.properties.avg_price),
+                        weight: 2,
+                        opacity: 1,
+                        color: 'black',
+                        dashArray: '3',
+                        fillOpacity: 0.7
+                    }
+                }
+                function highlightFeature(e) {
+                    var layer = e.target;
+                    layer.setStyle({
+                        weight: 5,
+                        color: '#666',
+                        dashArray: '',
+                        fillOpacity: 0.7
+                    });
+                    layer.bringToFront();
+                    info.update(layer.feature.properties);
+                }
+                const geojson = L.geoJson(santiagoGeoJson, {
+                    style: style,
+                    onEachFeature: onEachFeature
+                }).addTo(_map);
+                function resetHighlight(e) {
+                    geojson.resetStyle(e.target);
+                    info.update();
+                }
+                function onEachFeature(feature, layer) {
+                    layer.on({
+                        mouseover: highlightFeature,
+                        mouseout: resetHighlight
+                    });
+                }
+                var legend = L.control({position: 'bottomright'});
+                legend.onAdd = function (_map) {
+                    var div = L.DomUtil.create('div', 'info legend'),
+                    grades = [0, 37500, 75000, 112500, 150000, 187500, 225000, 262500];
+                    for (var i = 0; i < grades.length; i++) {
+                        div.innerHTML +=
+                            '<i style="background-color:' + getColor(grades[i] + 1) + '"></i> ' +
+                            grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+                    }
+                    return div;
+                };
+                legend.addTo(_map);
+        });
+    </script>
+</body>
+</html>
