@@ -66,6 +66,32 @@ app.get('/edinburgh/avg-reviews-by-neighbourhood-cleansed', (req, res) => {
     });
 });
 
+app.get('/edinburgh/coordinates-by-listing', (req, res) => {
+    var con = mysql.createConnection({
+        host: "localhost",
+        port: 3306,
+        user: "root",
+        password: "",
+        database: "pract1"
+    });
+    con.connect(err => {
+        if (err) {
+            res.status(500).send();
+            return;
+        }
+    });
+    con.query(`SELECT latitude, longitude ` +
+                `FROM geolocation ` +
+                `JOIN listing ON geolocation.id_listing = listing.id ` +
+                `WHERE geolocation.municipality = 'edinburgh'`, (err, result) => {
+        if (err) throw err;
+        res.json(result);
+    });
+    con.end(err => {
+        if (err) throw err;
+    });
+});
+
 app.get('/santiago/avg-price-by-neighbourhood-cleansed', (req, res) => {
     var con = mysql.createConnection({
         host: "localhost",
