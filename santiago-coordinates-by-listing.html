@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script src="https://cdn.jsdelivr.net/npm/leaflet.heat@0.2.0/dist/leaflet-heat.js"></script>
+</head>
+<body>
+    <div id="myMap" style="width: 1920px; height: 1080px"></div>
+    <script type="text/javascript">
+        fetch("http://localhost:3000/santiago/coordinates-by-listing")
+            .then(response => response.json())
+            .then(data => {
+                const _map = L.map("myMap").setView([-33.4569400, -70.6482700], 11);
+                L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+                    maxZoom: 19,
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+                }).addTo(_map);
+                var dataPoints = [];
+                data.forEach(listingCoordinates => {
+                    dataPoints.push([listingCoordinates.latitude, listingCoordinates.longitude]);
+                });
+                L.heatLayer(dataPoints, {
+                    radius: 15,
+                    blur: 20,
+                    maxZoom: 17
+                }).addTo(_map);
+        });
+    </script>
+</body>
+</html>
